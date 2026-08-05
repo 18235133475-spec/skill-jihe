@@ -13,3 +13,4 @@ npx skills add 18235133475-spec/skill-jihe@<skill名>
 | Skill | 说明 | 来源 |
 |---|---|---|
 | `hv-analysis` | 横纵分析法深度研究（v1.1 定制版：schema 接线、引证持久化、脚本化质检） | 改自 [KKKKhazix/khazix-skills](https://github.com/KKKKhazix/khazix-skills) |
+| `human-writing` | 活人感写作 1.0.0：通用中文创作与改稿，材料纪律 + 脚本化去AI味硬校验 | 原版镜像 [KKKKhazix/human-writing](https://github.com/KKKKhazix/human-writing) |
