@@ -1,0 +1,16 @@
+# 工作区：未发表的文章底稿、调研笔记、成稿
+workbench/
+
+# 本地设置
+.claude/
+
+# 凭据（脚本从 ~/.config/city-mirror/ 读取，本不在仓库内，此处双保险）
+wechat.json
+.token_cache.json
+*.credentials.json
+
+# 系统与工具产物
+.DS_Store
+__pycache__/
+*.pyc
+.venv*/
