@@ -62,9 +62,24 @@ python3 scripts/push_to_wechat.py 预排版.html --dry-run
 python3 scripts/md_to_pdf.py 输入.md 输出.pdf
 ```
 
-## 配套 skill
+### `scripts/gen_chart.py`
 
-配图环节调用同仓库的 [`gzh-chart`](../gzh-chart) 生成数据图表（900px 宽 PNG，公众号规格）。
+公众号正文配图直出（自包含，不依赖外部 skill）。中文字体注册、900px 宽 PNG、纯白底、口径注脚右下角均已内置。
+
+```python
+from gen_chart import line, bar, barh
+
+line(x=[2019, 2022, 2023, 2024], y=[1952.81, 1761.40, 1912.88, 1946.92],
+     title="太原社会消费品零售总额变化（2019—2024）", ylabel="社零总额（亿元）",
+     source="太原市统计公报（各年）", out="图1.png",
+     gaps=[(2019, 2022)], gap_note="2020—2021 数据未取得")  # 缺口画虚线
+```
+
+依赖 `matplotlib`。三种图型：`line`（时间序列）/ `bar`（柱状）/ `barh`（横向条形）。
+
+## 配套 skill（可选）
+
+需要三种图型之外的图（热力图、小多图、堆叠面积等）时，调用同仓库的 [`gzh-chart`](../gzh-chart)。**不装不影响基础出图**。
 
 ## 安装
 
@@ -72,7 +87,7 @@ python3 scripts/md_to_pdf.py 输入.md 输出.pdf
 npx skills add 18235133475-spec/skill-jihe@city-mirror
 ```
 
-配套的 gzh-chart 一并装上：
+出图能力已内置，无需其他 skill。只有要画热力图、小多图等进阶图型时才需另装：
 
 ```bash
 npx skills add 18235133475-spec/skill-jihe@gzh-chart
