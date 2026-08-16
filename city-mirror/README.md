@@ -26,6 +26,7 @@
 |---|---|
 | `SKILL.md` | 主文件，完整流程与纪律 |
 | `CHANGELOG.md` | 变更日志，含实战审计台账 |
+| `references/stages/` | 九个阶段文件，每个自带入口/出口/红线表头，改哪步开哪个 |
 | `references/` | 底稿模板、叙事原则、样式样例、调研 Agent 提示词 |
 | `scripts/` | 交付脚本（见下） |
 
@@ -53,6 +54,25 @@ python3 scripts/push_to_wechat.py 预排版.html --dry-run
 **前置条件**：
 - 公众号须为**已认证**服务号或订阅号（个人订阅号无草稿箱 API 权限，报 48001）
 - 服务器出口 IP 须加入公众号后台白名单（设置与开发 → 基本配置 → IP 白名单，否则报 40164）
+
+### `scripts/check_skill.py`
+
+改完 skill 后跑一遍，检查七项一致性（悬空引用／孤儿文件／阶段接口对齐／表头完整／废止术语残留／版本同步／体量看板）。
+
+```bash
+python3 scripts/check_skill.py
+```
+
+**建议的改稿流程**：
+
+```bash
+git checkout -b 改03立意                      # 开分支
+vim references/stages/03-thesis.md            # 只改一个阶段
+python3 scripts/check_skill.py                # 自检
+git diff                                      # 看改了什么
+```
+
+改坏了 `git checkout .` 退回。
 
 ### `scripts/md_to_pdf.py`
 
