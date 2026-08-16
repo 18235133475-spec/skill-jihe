@@ -10,7 +10,7 @@
     2. 孤儿文件      存在但没人引用的文件
     3. 接口对齐      阶段文件声明的入口/出口 vs SKILL.md 接口总表
     4. 阶段文件表头  九个阶段文件是否都有入口/出口/红线/拍板点四项
-    5. 废止术语      改名后是否有残留（样式甲乙丙丁等）
+    5. 废止术语      改名后是否有残留（样式甲乙丙丁等）；CHANGELOG/AUDIT 为历史记录，豁免
     6. 版本同步      SKILL.md 版本行 vs CHANGELOG 最新条目
     7. 体量看板      常驻/按需各多少 token（非错误，仅提示）
 
@@ -46,7 +46,7 @@ RETIRED = [
 
 def check_dangling_and_orphan():
     """1&2：悬空引用 / 孤儿文件"""
-    md = [p for p in glob.glob('*.md') if os.path.basename(p) != 'CHANGELOG.md']
+    md = [p for p in glob.glob('*.md') if os.path.basename(p) not in ('CHANGELOG.md', 'AUDIT.md')]
     md += glob.glob('references/**/*.md', recursive=True)
     all_text = '\n'.join(read(p) for p in md)
     referenced = set()
@@ -95,8 +95,8 @@ def check_interfaces():
 def check_retired():
     """5：废止术语残留"""
     for p in glob.glob('*.md') + glob.glob('references/**/*.md', recursive=True):
-        if os.path.basename(p) == 'CHANGELOG.md':
-            continue  # 台账保留历史称呼
+        if os.path.basename(p) in ('CHANGELOG.md', 'AUDIT.md'):
+            continue  # 变更史与台账是历史记录，保留当时的称呼
         t = read(p)
         for pat, why in RETIRED:
             for m in re.finditer(pat, t):
