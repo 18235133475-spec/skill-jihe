@@ -5,14 +5,15 @@
 用法：
     python3 scripts/check_skill.py          # 在 skill 根目录下运行
 
-查七项（每一项都对应一次真实翻车）：
+查八项（每一项都对应一次真实翻车）：
     1. 悬空引用      文中提到的文件是否都存在
     2. 孤儿文件      存在但没人引用的文件
     3. 接口对齐      阶段文件声明的入口/出口 vs SKILL.md 接口总表
     4. 阶段文件表头  九个阶段文件是否都有入口/出口/红线/拍板点四项
     5. 废止术语      改名后是否有残留（样式甲乙丙丁等）；CHANGELOG/AUDIT 为历史记录，豁免
     6. 版本同步      SKILL.md 版本行 vs CHANGELOG 最新条目
-    7. 体量看板      常驻/按需各多少 token（非错误，仅提示）
+    7. 标题层级      阶段文件是否 # 文件名 / ## 环节 / ### 子项 逐级不跳（识别代码块）
+    8. 体量看板      常驻/按需各多少 token（非错误，仅提示）
 
 退出码：0 全过；1 有错误（✗）；错误之外的提醒（!）不影响退出码。
 """
@@ -92,6 +93,36 @@ def check_interfaces():
             ERR.append(f'接口：总表列出 {f}，但文件不存在')
 
 
+def check_headings():
+    """8：阶段文件标题层级（约定：# 文件名 / ## 环节 / ### 子项 / #### 细分）"""
+    for p in sorted(glob.glob('references/stages/*.md')):
+        base = os.path.basename(p)
+        levels, infence = [], False
+        for n, line in enumerate(read(p).split('\n'), 1):
+            if line.strip().startswith('```'):
+                infence = not infence
+                continue
+            if infence:
+                continue          # 代码块内的 ## 是模板内容，不是标题
+            m = re.match(r'^(#{1,6}) ', line)
+            if m:
+                levels.append((n, len(m.group(1)), line.strip()))
+        if not levels:
+            ERR.append(f'标题层级：{base} 没有任何标题')
+            continue
+        if levels[0][1] != 1:
+            ERR.append(f'标题层级：{base} 首个标题不是 # 级')
+        if sum(1 for _, lv, _ in levels if lv == 1) > 1:
+            ERR.append(f'标题层级：{base} 出现多个 # 级标题')
+        if not any(lv == 2 for _, lv, _ in levels):
+            WARN.append(f'标题层级：{base} 没有 ## 级环节标题，不利于分段编辑')
+        prev = 1
+        for n, lv, txt in levels[1:]:
+            if lv > prev + 1:
+                ERR.append(f'标题层级：{base}:{n} 从 {"#"*prev} 直接跳到 {"#"*lv} —— {txt[:28]}')
+            prev = lv
+
+
 def check_retired():
     """5：废止术语残留"""
     for p in glob.glob('*.md') + glob.glob('references/**/*.md', recursive=True):
@@ -139,6 +170,7 @@ def main():
     check_dangling_and_orphan()
     check_interfaces()
     check_retired()
+    check_headings()
     check_version()
 
     print('=== city-mirror 一致性自检 ===')
@@ -147,7 +179,7 @@ def main():
         for e in ERR:
             print(f'  ✗ {e}')
     else:
-        print('\n✓ 七项检查全过')
+        print('\n✓ 八项检查全过')
     if WARN:
         print(f'\n! {len(WARN)} 处提醒（不阻塞）：')
         for w in WARN:
