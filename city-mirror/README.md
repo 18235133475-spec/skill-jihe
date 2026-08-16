@@ -27,7 +27,7 @@
 | `SKILL.md` | 主文件，完整流程与纪律 |
 | `CHANGELOG.md` | 变更日志：每版改了什么 |
 | `AUDIT.md` | 实战审计台账：每篇文章里哪些规则真出了力（规则去留的证据） |
-| `references/stages/` | 九个阶段文件，每个自带入口/出口/红线表头，改哪步开哪个 |
+| `references/stages/` | 十个阶段文件，每个自带入口/出口/红线表头，改哪步开哪个 |
 | `references/` | 底稿模板、叙事原则、样式样例、调研 Agent 提示词 |
 | `scripts/` | 交付脚本（见下） |
 
@@ -68,7 +68,7 @@ python3 scripts/check_skill.py
 
 ```bash
 git checkout -b 改03立意                      # 开分支
-vim references/stages/03-thesis.md            # 只改一个阶段
+vim references/stages/04-thesis.md            # 只改一个阶段
 python3 scripts/check_skill.py                # 自检
 git diff                                      # 看改了什么
 ```

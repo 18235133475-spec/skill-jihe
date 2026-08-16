@@ -72,7 +72,7 @@ def check_dangling_and_orphan():
 def check_interfaces():
     """3&4：阶段文件表头 + 与接口总表对齐"""
     skill = read('SKILL.md')
-    rows = re.findall(r'^\|\s*[①②③④⑤⑥⑦⑧⑨][^|]*\|\s*`([^`]+)`\s*\|([^|]*)\|([^|]*)\|', skill, re.M)
+    rows = re.findall(r'^\|\s*[①②③④⑤⑥⑦⑧⑨⑩][^|]*\|\s*`([^`]+)`\s*\|([^|]*)\|([^|]*)\|', skill, re.M)
     table = {os.path.basename(f.strip()): (i.strip(), o.strip()) for f, i, o in rows}
 
     files = sorted(glob.glob('references/stages/*.md'))
