@@ -6,10 +6,10 @@
     python3 scripts/check_skill.py          # 在 skill 根目录下运行
 
 查八项（每一项都对应一次真实翻车）：
-    1. 悬空引用      文中提到的文件是否都存在
+    1. 悬空引用      文中提到的文件是否都存在（含裸阶段文件名，如 08-review.md）
     2. 孤儿文件      存在但没人引用的文件
-    3. 接口对齐      阶段文件声明的入口/出口 vs SKILL.md 接口总表
-    4. 阶段文件表头  九个阶段文件是否都有入口/出口/红线/拍板点四项
+    3. 接口对齐      阶段文件 vs SKILL.md 接口总表（含拍板点：两边同有或同无）
+    4. 阶段文件表头  十个阶段文件是否都有入口/出口/红线/拍板点四项
     5. 废止术语      改名后是否有残留（样式甲乙丙丁等）；CHANGELOG/AUDIT 为历史记录，豁免
     6. 版本同步      SKILL.md 版本行 vs CHANGELOG 最新条目
     7. 标题层级      阶段文件是否 # 文件名 / ## 环节 / ### 子项 逐级不跳（识别代码块）
@@ -58,7 +58,9 @@ def check_dangling_and_orphan():
                    glob.glob('references/**/*.md', recursive=True) + glob.glob('scripts/*.py'))
 
     for r in sorted(referenced):
-        if r.endswith(('.md', '.py')) and ('references/' in r or 'scripts/' in r):
+        # 裸阶段文件名（如 08-review.md）也要查——改编号时最容易漏这种引用
+        stage_like = '/' not in r and re.match(r'^\d\d-[\w-]+\.md$', r)
+        if r.endswith(('.md', '.py')) and ('references/' in r or 'scripts/' in r or stage_like):
             cands = {r, os.path.normpath('references/' + r), os.path.normpath('references/stages/' + os.path.basename(r))}
             if not (cands & existing):
                 ERR.append(f'悬空引用：{r} 被引用但不存在')
@@ -72,8 +74,8 @@ def check_dangling_and_orphan():
 def check_interfaces():
     """3&4：阶段文件表头 + 与接口总表对齐"""
     skill = read('SKILL.md')
-    rows = re.findall(r'^\|\s*[①②③④⑤⑥⑦⑧⑨⑩][^|]*\|\s*`([^`]+)`\s*\|([^|]*)\|([^|]*)\|', skill, re.M)
-    table = {os.path.basename(f.strip()): (i.strip(), o.strip()) for f, i, o in rows}
+    rows = re.findall(r'^\|\s*[①②③④⑤⑥⑦⑧⑨⑩][^|]*\|\s*`([^`]+)`\s*\|([^|]*)\|([^|]*)\|([^|]*)\|', skill, re.M)
+    table = {os.path.basename(f.strip()): (i.strip(), o.strip(), d.strip()) for f, i, o, d in rows}
 
     files = sorted(glob.glob('references/stages/*.md'))
     if not files:
@@ -87,6 +89,15 @@ def check_interfaces():
                 ERR.append(f'表头缺项：{base} 缺「{field}」')
         if base not in table:
             ERR.append(f'接口：{base} 未出现在 SKILL.md 接口总表中')
+            continue
+        # 拍板点两边必须同时有或同时无——⑤把拍板点移到⑧时，总表漏改就是这么溜过去的
+        m = re.search(r'^> \*\*用户拍板点\*\*[：:](.*)$', t, re.M)
+        if m:
+            stage_none = m.group(1).strip().rstrip('。') == '无'
+            table_none = table[base][2] in ('—', '-', '无', '')
+            if stage_none != table_none:
+                ERR.append(f'接口：{base} 拍板点与总表对不上'
+                           f'（阶段文件「{m.group(1).strip()[:20]}」vs 总表「{table[base][2][:20]}」）')
 
     for f in table:
         if not os.path.exists(f'references/stages/{f}'):
