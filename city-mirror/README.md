@@ -91,10 +91,19 @@ python3 scripts/md_to_pdf.py 输入.md 输出.pdf
 ```python
 from gen_chart import line, bar, barh
 
+# 折线用 x=；柱状与横条用 labels=（三个函数的第一个参数名不同，别类推）
 line(x=[2019, 2022, 2023, 2024], y=[1952.81, 1761.40, 1912.88, 1946.92],
      title="太原社会消费品零售总额变化（2019—2024）", ylabel="社零总额（亿元）",
      source="太原市统计公报（各年）", out="图1.png",
      gaps=[(2019, 2022)], gap_note="2020—2021 数据未取得")  # 缺口画虚线
+
+bar(labels=["2022年", "2023年", "2024年"], y=[39, 46, 43],
+    title="太原万象城年销售额（2022—2024）", ylabel="销售额（亿元）",
+    source="华润年报", out="图2.png", fmt="{:.0f}亿")
+
+barh(labels=["商业部分", "住宅及其他"], y=[45, 65],
+     title="项目总投资构成（约110亿元）",
+     source="赢商网", out="图3.png", fmt="{:.0f}亿元")
 ```
 
 依赖 `matplotlib`。三种图型：`line`（时间序列）/ `bar`（柱状）/ `barh`（横向条形）。
