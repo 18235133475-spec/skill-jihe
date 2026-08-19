@@ -55,7 +55,8 @@ def check_dangling_and_orphan():
         referenced.add(os.path.normpath(m.group(1)))
 
     existing = set(os.path.normpath(p) for p in
-                   glob.glob('references/**/*.md', recursive=True) + glob.glob('scripts/*.py'))
+                   glob.glob('references/**/*.md', recursive=True)
+                   + glob.glob('scripts/*.py') + glob.glob('scripts/*.md'))
 
     for r in sorted(referenced):
         # 裸阶段文件名（如 08-review.md）也要查——改编号时最容易漏这种引用
