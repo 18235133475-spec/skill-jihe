@@ -190,7 +190,10 @@ def _wrap(s, limit):
         cw = _units(ch)
         if w + cw > limit and cur:
             cut = len(cur)
-            for i in range(len(cur) - 1, int(len(cur) * 0.5) - 1, -1):
+            # 回看窗口取后 68%——只覆盖后半时，标点稍靠前就会落在窗外，
+            # 结果把词从中间劈开（实测："国标施行，物业费不在提取情形内"
+            # 按 11 字断行，逗号在 45% 处失配，断成"…不在提／取情形内"）
+            for i in range(len(cur) - 1, int(len(cur) * 0.32) - 1, -1):
                 if cur[i] in _BREAK_AFTER:
                     cut = i + 1
                     break
